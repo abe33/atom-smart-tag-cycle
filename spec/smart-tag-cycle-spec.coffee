@@ -7,24 +7,59 @@ SmartTagCycle = require '../lib/smart-tag-cycle'
 # or `fdescribe`). Remove the `f` to unfocus the block.
 
 describe "SmartTagCycle", ->
-  activationPromise = null
+  [activationPromise, editorView, editor] = []
 
   beforeEach ->
     atom.workspaceView = new WorkspaceView
-    activationPromise = atom.packages.activatePackage('smart-tag-cycle')
+    atom.workspaceView.attachToDom()
 
-  describe "when the smart-tag-cycle:toggle event is triggered", ->
-    it "attaches and then detaches the view", ->
-      expect(atom.workspaceView.find('.smart-tag-cycle')).not.toExist()
+    waitsForPromise ->
+        atom.workspaceView.open('sample.erb')
 
-      # This is an activation event, triggering it will cause the package to be
-      # activated.
-      atom.workspaceView.trigger 'smart-tag-cycle:toggle'
+    runs ->
+      editorView = atom.workspaceView.getActiveView()
+      editor = editorView.getEditor()
 
-      waitsForPromise ->
-        activationPromise
+    waitsForPromise ->
+      activationPromise = atom.packages.activatePackage('smart-tag-cycle')
+      activationPromise
 
-      runs ->
-        expect(atom.workspaceView.find('.smart-tag-cycle')).toExist()
-        atom.workspaceView.trigger 'smart-tag-cycle:toggle'
-        expect(atom.workspaceView.find('.smart-tag-cycle')).not.toExist()
+  describe "when the smart-tag-cycle:erb command is triggered", ->
+
+    describe "with the cursor outside of a target tag", ->
+      beforeEach ->
+        editorView.setText("""
+        <html>
+          <head>
+          </head>
+          <body>
+            <%= yield %>
+          </body>
+        </html>
+        """)
+        editor.setCursorBufferPosition([1,8])
+
+      it 'inserts the corresponding tag', ->
+        editorView.trigger 'smart-tag-cycle:erb'
+
+        expect(editor.lineForBufferRow(1)).toEqual("  <head><% %>")
+        expect(editor.getCursorBufferPosition()).toEqual([1,10])
+
+    describe 'with the cursor inside a match', ->
+      beforeEach ->
+        editorView.setText("""
+        <html>
+          <head>
+            <% %>
+          </head>
+          <body>
+            <%= yield %>
+          </body>
+        </html>
+        """)
+        editor.setCursorBufferPosition([2,6])
+
+      it 'cycle to the next match', ->
+        editorView.trigger 'smart-tag-cycle:erb'
+        expect(editor.lineForBufferRow(2)).toEqual("    <% %>")
+        expect(editor.getCursorBufferPosition()).toEqual([5,6])
