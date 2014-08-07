@@ -11,27 +11,27 @@ module.exports =
 
   deactivate: ->
 
-  registerCommandForPattern: (name, [prefix, suffix]) ->
+  registerCommandForPattern: (name, args) ->
+    atom.workspaceView.command "smart-tag-cycle:#{name}", @buildCommand(args)
+    atom.workspaceView.command "smart-tag-cycle:#{name}-backward", @buildCommand(args, true)
+
+  buildCommand: ([prefix, suffix], backward=false) -> =>
     regex = ///#{prefix}.*?#{suffix}///g
 
-    atom.workspaceView.command "smart-tag-cycle:#{name}", =>
-      editor = atom.workspace.getActiveEditor()
-      matches = @scanEditor(editor, regex)
+    editor = atom.workspace.getActiveEditor()
+    matches = @scanEditor(editor, regex)
 
-      console.log editor.getText(), matches
-
-      if (index = @cursorInMatches(editor, matches))?
-        console.log index
-        @cycleToNextMatch(editor, prefix, matches, index)
+    if (index = @cursorInMatches(editor, matches))?
+      if backward
+        @cycleToPreviousMatch(editor, prefix, matches, index)
       else
-        @insertAtCursor(editor, prefix, suffix)
+        @cycleToNextMatch(editor, prefix, matches, index)
+    else
+      @insertAtCursor(editor, prefix, suffix)
 
   scanEditor: (editor, regex) ->
     results = []
-    console.log regex
-    editor.scan regex, (result) ->
-      results.push result
-      console.log 'in iterator'
+    editor.scan regex, (result) -> results.push result
     results
 
   insertAtCursor: (editor, prefix, suffix) ->
@@ -48,6 +48,13 @@ module.exports =
   cycleToNextMatch: (editor, prefix, matches, i) ->
     nextIndex = i + 1
     nextIndex = 0 if nextIndex >= matches.length
+
+    cursor = matches[nextIndex].range.start
+    editor.setCursorBufferPosition([cursor.row, cursor.column + prefix.length])
+
+  cycleToPreviousMatch: (editor, prefix, matches, i) ->
+    nextIndex = i - 1
+    nextIndex = matches.length - 1 if nextIndex < 0
 
     cursor = matches[nextIndex].range.start
     editor.setCursorBufferPosition([cursor.row, cursor.column + prefix.length])
