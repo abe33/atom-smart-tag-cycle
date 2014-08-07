@@ -1,6 +1,7 @@
 
 module.exports =
   configDefaults:
+    selectAllTagContent: false
     patterns:
       erb: ['<%','%>']
       php: ['<?','?>']
@@ -24,18 +25,18 @@ module.exports =
 
     if (index = @cursorInMatches(editor, matches))?
       if backward
-        @cycleToPreviousMatch(editor, prefix, matches, index)
+        @cycleToPreviousMatch({editor, prefix, suffix, matches, index})
       else
-        @cycleToNextMatch(editor, prefix, matches, index)
+        @cycleToNextMatch({editor, prefix, suffix, matches, index})
     else
-      @insertAtCursor(editor, prefix, suffix)
+      @insertAtCursor({editor, prefix, suffix})
 
   scanEditor: (editor, regex) ->
     results = []
     editor.scan regex, (result) -> results.push result
     results
 
-  insertAtCursor: (editor, prefix, suffix) ->
+  insertAtCursor: ({editor, prefix, suffix}) ->
     cursor = editor.getCursorBufferPosition()
     editor.insertText(prefix + ' ' + suffix)
     editor.setCursorBufferPosition([cursor.row, cursor.column + prefix.length])
@@ -46,16 +47,29 @@ module.exports =
 
     null
 
-  cycleToNextMatch: (editor, prefix, matches, i) ->
-    nextIndex = i + 1
+  cycleToNextMatch: ({editor, prefix, suffix, matches, index}) ->
+    nextIndex = index + 1
     nextIndex = 0 if nextIndex >= matches.length
 
-    cursor = matches[nextIndex].range.start
-    editor.setCursorBufferPosition([cursor.row, cursor.column + prefix.length])
+    @moveToMatch({editor, prefix, suffix, match: matches[nextIndex].range})
 
-  cycleToPreviousMatch: (editor, prefix, matches, i) ->
-    nextIndex = i - 1
-    nextIndex = matches.length - 1 if nextIndex < 0
+  cycleToPreviousMatch: ({editor, prefix, suffix, matches, index}) ->
+    previousIndex = index - 1
+    previousIndex = matches.length - 1 if previousIndex < 0
 
-    cursor = matches[nextIndex].range.start
-    editor.setCursorBufferPosition([cursor.row, cursor.column + prefix.length])
+    @moveToMatch({editor, prefix, suffix, match: matches[previousIndex].range})
+
+  moveToMatch: ({editor, match, prefix, suffix}) ->
+    if atom.config.get 'smart-tag-cycle.selectAllTagContent'
+      cursorStart = match.start
+      cursorEnd = match.end
+      editor.setSelectedBufferRange([
+        [cursorStart.row, cursorStart.column + prefix.length]
+        [cursorEnd.row, cursorEnd.column - suffix.length]
+      ])
+    else
+      cursor = match.start
+      editor.setCursorBufferPosition([
+        cursor.row
+        cursor.column + prefix.length
+      ])

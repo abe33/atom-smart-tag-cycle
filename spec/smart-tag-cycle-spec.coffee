@@ -14,7 +14,7 @@ describe "SmartTagCycle", ->
     atom.workspaceView.simulateDomAttachment()
 
     waitsForPromise ->
-        atom.workspaceView.open('sample.erb')
+      atom.workspaceView.open('sample.erb')
 
     runs ->
       editorView = atom.workspaceView.getActiveView()
@@ -137,3 +137,24 @@ describe "SmartTagCycle", ->
             editorView.trigger 'smart-tag-cycle:erb-backward'
             expect(editor.lineForBufferRow(2)).toEqual("    <% %>")
             expect(editor.getCursorBufferPosition()).toEqual([5,6])
+
+  describe 'when the select all tag content option is enabled', ->
+    beforeEach ->
+      atom.config.set 'smart-tag-cycle.selectAllTagContent', true
+      runs ->
+        editorView.setText("""
+        <html>
+          <head>
+            <% %>
+          </head>
+          <body>
+            <%= yield %>
+          </body>
+        </html>
+        """)
+        editor.setCursorBufferPosition([2,6])
+
+    it 'selects the whole tag content', ->
+      editorView.trigger 'smart-tag-cycle:erb'
+
+      expect(editor.getSelectedBufferRange()).toEqual([[5,6],[5,14]])
