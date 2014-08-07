@@ -1,5 +1,5 @@
 # smart-tag-cycle package
 
-A short description of your package.
+[![Build Status](https://travis-ci.org/abe33/atom-smart-tag-cycle.svg)](https://travis-ci.org/abe33/atom-smart-tag-cycle)
 
-![A screenshot of your spankin' package](https://f.cloud.github.com/assets/69169/2290250/c35d867a-a017-11e3-86be-cd7c5bf3ff9b.gif)
+Wraps the cursor with a tag or cycle between the existing tags in a buffer.
