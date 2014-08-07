@@ -20,46 +20,52 @@ describe "SmartTagCycle", ->
       editorView = atom.workspaceView.getActiveView()
       editor = editorView.getEditor()
 
-    waitsForPromise ->
       activationPromise = atom.packages.activatePackage('smart-tag-cycle')
-      activationPromise
 
   describe "when the smart-tag-cycle:erb command is triggered", ->
 
     describe "with the cursor outside of a target tag", ->
       beforeEach ->
-        editorView.setText("""
-        <html>
-          <head>
-          </head>
-          <body>
-            <%= yield %>
-          </body>
-        </html>
-        """)
-        editor.setCursorBufferPosition([1,8])
+        runs ->
+          editorView.setText("""
+          <html>
+            <head>
+            </head>
+            <body>
+              <%= yield %>
+            </body>
+          </html>
+          """)
+          editor.setCursorBufferPosition([1,8])
 
       it 'inserts the corresponding tag', ->
-        editorView.trigger 'smart-tag-cycle:erb'
+        waitsForPromise -> activationPromise
 
-        expect(editor.lineForBufferRow(1)).toEqual("  <head><% %>")
-        expect(editor.getCursorBufferPosition()).toEqual([1,10])
+        runs ->
+          editorView.trigger 'smart-tag-cycle:erb'
+
+          expect(editor.lineForBufferRow(1)).toEqual("  <head><% %>")
+          expect(editor.getCursorBufferPosition()).toEqual([1,10])
 
     describe 'with the cursor inside a match', ->
       beforeEach ->
-        editorView.setText("""
-        <html>
-          <head>
-            <% %>
-          </head>
-          <body>
-            <%= yield %>
-          </body>
-        </html>
-        """)
-        editor.setCursorBufferPosition([2,6])
+        runs ->
+          editorView.setText("""
+          <html>
+            <head>
+              <% %>
+            </head>
+            <body>
+              <%= yield %>
+            </body>
+          </html>
+          """)
+          editor.setCursorBufferPosition([2,6])
 
       it 'cycle to the next match', ->
-        editorView.trigger 'smart-tag-cycle:erb'
-        expect(editor.lineForBufferRow(2)).toEqual("    <% %>")
-        expect(editor.getCursorBufferPosition()).toEqual([5,6])
+        waitsForPromise -> activationPromise
+
+        runs ->
+          editorView.trigger 'smart-tag-cycle:erb'
+          expect(editor.lineForBufferRow(2)).toEqual("    <% %>")
+          expect(editor.getCursorBufferPosition()).toEqual([5,6])
