@@ -3,6 +3,7 @@ module.exports =
   configDefaults:
     patterns:
       erb: ['<%','%>']
+      php: ['<?','?>']
 
   activate: (state) ->
     patterns = atom.config.get('smart-tag-cycle.patterns')
