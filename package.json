@@ -1,0 +1,14 @@
+{
+  "name": "smart-tag-cycle",
+  "main": "./lib/smart-tag-cycle",
+  "version": "0.0.0",
+  "description": "A short description of your package",
+  "activationEvents": ["smart-tag-cycle:toggle"],
+  "repository": "https://github.com/atom/smart-tag-cycle",
+  "license": "MIT",
+  "engines": {
+    "atom": ">0.50.0"
+  },
+  "dependencies": {
+  }
+}
