@@ -119,7 +119,7 @@ describe "SmartTagCycle", ->
           """)
           editor.setCursorBufferPosition([5,6])
 
-      it 'cycles to the next match', ->
+      it 'cycles to the previous match', ->
         waitsForPromise -> activationPromise
 
         runs ->
@@ -127,8 +127,8 @@ describe "SmartTagCycle", ->
           expect(editor.lineForBufferRow(5)).toEqual("    <%= yield %>")
           expect(editor.getCursorBufferPosition()).toEqual([2,6])
 
-      describe 'that is the last match', ->
-        it 'cycles to the first', ->
+      describe 'that is the first match', ->
+        it 'cycles to the last', ->
           editor.setCursorBufferPosition([2,6])
 
           waitsForPromise -> activationPromise
