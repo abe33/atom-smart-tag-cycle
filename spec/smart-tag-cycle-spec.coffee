@@ -12,6 +12,9 @@ describe "SmartTagCycle", ->
   beforeEach ->
     atom.workspaceView = new WorkspaceView
     atom.workspaceView.simulateDomAttachment()
+    atom.config.set 'smart-tag-cycle.patterns', {
+      erb: ['<%', '%>']
+    }
 
     waitsForPromise ->
       atom.workspaceView.open('sample.erb')
