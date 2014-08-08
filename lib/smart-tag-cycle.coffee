@@ -10,7 +10,8 @@ module.exports =
     console.log 'in activate'
     patterns = atom.config.get('smart-tag-cycle.patterns')
 
-    console.log 'patterns = ', patterns
+    console.log 'patterns = '
+    console.log patterns
 
     @registerCommandsForPattern(k,v) for k,v of patterns
 
