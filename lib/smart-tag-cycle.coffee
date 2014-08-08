@@ -44,8 +44,7 @@ module.exports =
   cursorInMatches: (editor, matches) ->
     cursor = editor.getCursorBufferPosition()
     return i for match,i in matches when match.range.containsPoint(cursor)
-
-    null
+    return null
 
   cycleToNextMatch: ({editor, prefix, suffix, matches, index}) ->
     nextIndex = index + 1
