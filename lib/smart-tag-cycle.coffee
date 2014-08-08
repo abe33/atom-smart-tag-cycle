@@ -7,17 +7,22 @@ module.exports =
       php: ['<?','?>']
 
   activate: (state) ->
+    console.log 'in activate'
     patterns = atom.config.get('smart-tag-cycle.patterns')
 
-    @registerCommandForPattern(k,v) for k,v of patterns
+    console.log 'patterns = ', patterns
+
+    @registerCommandsForPattern(k,v) for k,v of patterns
 
   deactivate: ->
 
-  registerCommandForPattern: (name, args) ->
+  registerCommandsForPattern: (name, args) ->
+    console.log "register commands for pattern #{name}"
     atom.workspaceView.command "smart-tag-cycle:#{name}", @buildCommand(args)
     atom.workspaceView.command "smart-tag-cycle:#{name}-backward", @buildCommand(args, true)
 
   buildCommand: ([prefix, suffix], backward=false) -> =>
+    console.log "in command for #{name} backward=#{backward}"
     regex = ///#{prefix}.*?#{suffix}///g
 
     editor = atom.workspace.getActiveEditor()
