@@ -1,3 +1,11 @@
+<a name="v0.2.0"></a>
+# v0.2.0 (2014-08-09)
+
+## :sparkles: Features
+
+- Add option to select all the tag content on cycling ([fddd8b3b](https://github.com/abe33/atom-smart-tag-cycle/commit/fddd8b3bf6dd1062a7c991afcaf44697339febbe))
+- Add php embed tag support ([f58b47da](https://github.com/abe33/atom-smart-tag-cycle/commit/f58b47da7d719d0c80bea4cda6c1a9fb4ea99932))
+
 <a name="v0.1.0"></a>
 # v0.1.0 (2014-08-07)
 
